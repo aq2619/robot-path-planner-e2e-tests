@@ -27,9 +27,9 @@ test.describe('Alert Monitoring During Operations', () => {
     await waitForMapLoad(page);
 
     // Check for a "No Warnings or errors" message or an empty alerts section
-    const noAlertsLocator = page.locator(
-      'text=/No Warnings or errors/i, [data-testid="no-alerts"], .no-alerts'
-    );
+    const noAlertsLocator = page.locator('text=/No Warnings or errors/i')
+      .or(page.locator('[data-testid="no-alerts"]'))
+      .or(page.locator('.no-alerts'));
     const alertsSection = page.locator('[data-testid="alerts"], .alerts, #alerts').first();
 
     const noAlertsVisible = (await noAlertsLocator.count()) > 0;
