@@ -1,5 +1,43 @@
 // Zone Type Definitions
 
+type RestrictedZone = {
+    name: string;
+    area: string;
+    restrictions: string;
+};
+
+type OneWayZone = {
+    name: string;
+    direction: string;
+};
+
+type AvoidanceZone = {
+    name: string;
+    reason: string;
+};
+
+type MaxCapacityZone = {
+    name: string;
+    capacity: number;
+};
+
+type MaxVelocityZone = {
+    name: string;
+    maxVelocity: number;
+};
+
+type NoPassingZone = {
+    name: string;
+};
+
+// Helper functions for generating zone names
+function generateZoneName(type: string, id: number): string {
+    const timestamp = new Date(1681383625000).toISOString().replace(/[-:.]/g, '_').split('T').join('_');
+    return `test_zone_${type}_${timestamp}_${id}`;
+}
+
+export { RestrictedZone, OneWayZone, AvoidanceZone, MaxCapacityZone, MaxVelocityZone, NoPassingZone, generateZoneName };// Zone Type Definitions
+
 export type RestrictedZone = {
   id: string;
   name: string;
