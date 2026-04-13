@@ -1,40 +1,34 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
-const API_BASE_URL = 'http://localhost:1000/node-api/edge';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:1000/node-api/edge';
 
-// Function to check the health of the API
-export const checkHealth = async () => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/health`);
-        return response.data;
-    } catch (error) {
-        throw new Error(`Error checking health: ${error.message}`);
+export class APIClient {
+  private client: AxiosInstance;
+
+  constructor(baseURL: string = API_BASE_URL) {
+    this.client = axios.create({ baseURL, timeout: 10000 });
+  }
+
+  /** GET /health – System health check */
+  async getHealth(): Promise<Record<string, unknown>> {
+    const response = await this.client.get<Record<string, unknown>>('/health');
+    return response.data;
+  }
+
+  /** GET /version – API version information */
+  async getVersion(): Promise<Record<string, unknown>> {
+    const response = await this.client.get<Record<string, unknown>>('/version');
+    return response.data;
+  }
+
+  /** GET /missions – List queued/completed missions */
+  async getMissions(): Promise<unknown[]> {
+    const response = await this.client.get<unknown[]>('/missions');
+    const missions = response.data;
+    if (!Array.isArray(missions)) {
+      throw new Error('Expected missions response to be an array');
     }
-};
+    return missions;
+  }
+}
 
-// Function to get the API version
-export const getVersion = async () => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/version`);
-        return response.data;
-    } catch (error) {
-        throw new Error(`Error getting version: ${error.message}`);
-    }
-};
-
-// Function to get missions and validate their structure
-export const getMissions = async () => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/missions`);
-        const missions = response.data;
-
-        // Validate structure (you can add your validation logic here)
-        if (!Array.isArray(missions)) {
-            throw new Error('Missions should be an array');
-        }
-
-        return missions;
-    } catch (error) {
-        throw new Error(`Error fetching missions: ${error.message}`);
-    }
-};
