@@ -1,4 +1,32 @@
-// src/fixtures/zones.fixture.ts
+export const zonesFixture = [
+    {
+        type: 'RestrictedZone',
+        coordinates: [
+            { x: 1, y: 1 },
+            { x: 5, y: 1 },
+            { x: 5, y: 5 },
+            { x: 1, y: 5 }
+        ]
+    },
+    {
+        type: 'OneWayZone',
+        coordinates: [
+            { x: 2, y: 2 },
+            { x: 6, y: 2 },
+            { x: 6, y: 6 },
+            { x: 2, y: 6 }
+        ]
+    },
+    {
+        type: 'AvoidanceZone',
+        coordinates: [
+            { x: 3, y: 3 },
+            { x: 7, y: 3 },
+            { x: 7, y: 7 },
+            { x: 3, y: 7 }
+        ]
+    }
+];// src/fixtures/zones.fixture.ts
 
 export const RestrictedZone = [
     { x: 1, y: 1 },
