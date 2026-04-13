@@ -1,1 +1,22 @@
-{"name": "robot-path-planner-e2e-tests", "version": "1.0.0", "scripts": { "test": "jest", "e2e": "playwright test" }, "devDependencies": { "@types/jest": "^27.0.0", "@types/node": "^16.0.0", "jest": "^27.0.0", "playwright": "^1.18.0", "typescript": "^4.5.0", "axios": "^0.21.1" }}
+{
+  "name": "robot-path-planner-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for the robot path planner frontend",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:health": "playwright test health.spec.ts",
+    "test:environment": "playwright test environment.spec.ts",
+    "test:missions": "playwright test missions.spec.ts",
+    "test:alerts": "playwright test alerts.spec.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}
