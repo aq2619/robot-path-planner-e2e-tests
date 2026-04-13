@@ -1,0 +1,1 @@
+{"name": "robot-path-planner-e2e-tests", "version": "1.0.0", "scripts": { "test": "jest", "e2e": "playwright test" }, "devDependencies": { "@types/jest": "^27.0.0", "@types/node": "^16.0.0", "jest": "^27.0.0", "playwright": "^1.18.0", "typescript": "^4.5.0", "axios": "^0.21.1" }}
