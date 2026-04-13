@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { TEST_ENVIRONMENTS } from '../config/test-environments';
-import { MISSION_TEMPLATES } from '../config/test-missions';
+import { getMissionTemplates } from '../config/test-missions';
 import {
   loadEnvironment,
   waitForMapLoad,
@@ -28,7 +28,7 @@ test.describe('Mission Creation Against Saved Zones', () => {
   });
 
   test('should create a mission and see it in the missions list', async ({ page }) => {
-    const template = MISSION_TEMPLATES[0];
+    const template = getMissionTemplates()[0];
 
     await openCreateMissionDialog(page);
     await fillMissionName(page, template.name);
@@ -42,7 +42,8 @@ test.describe('Mission Creation Against Saved Zones', () => {
   });
 
   test('should create multiple missions and list them all', async ({ page }) => {
-    for (const template of MISSION_TEMPLATES) {
+    const templates = getMissionTemplates();
+    for (const template of templates) {
       await openCreateMissionDialog(page);
       await fillMissionName(page, template.name);
       await submitDialog(page);
@@ -51,7 +52,7 @@ test.describe('Mission Creation Against Saved Zones', () => {
     }
 
     // All missions should appear in the list
-    for (const template of MISSION_TEMPLATES) {
+    for (const template of templates) {
       await expect(page.locator(`text=${template.name}`).first()).toBeVisible({ timeout: 15000 });
     }
 

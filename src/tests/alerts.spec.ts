@@ -4,16 +4,22 @@ import { loadEnvironment, waitForMapLoad, getAlertsText } from '../utils/test-he
 
 const env = TEST_ENVIRONMENTS.PRIMARY;
 
+/** Selector that matches active error/warning alert elements only */
+const ACTIVE_ALERT_SELECTOR =
+  '[data-testid="alert-error"], [data-testid="alert-warning"], ' +
+  '.alert--error, .alert--warning, ' +
+  '[role="alert"][class*="error"], [role="alert"][class*="warning"]';
+
 test.describe('Alert Monitoring During Operations', () => {
-  test('should show no warnings or errors on environment load', async ({ page }) => {
+  test('should show no active error or warning alerts on environment load', async ({ page }) => {
     await loadEnvironment(page, env.id);
     await waitForMapLoad(page);
 
     // Wait a moment for any async alerts to render
     await page.waitForTimeout(2000);
 
-    const alertsText = await getAlertsText(page);
-    expect(alertsText).not.toMatch(/warning|error/i);
+    const activeAlerts = page.locator(ACTIVE_ALERT_SELECTOR);
+    await expect(activeAlerts).toHaveCount(0);
   });
 
   test('should display healthy alerts section state', async ({ page }) => {
@@ -33,9 +39,9 @@ test.describe('Alert Monitoring During Operations', () => {
       // Explicit "no alerts" message is shown – ideal state
       await expect(noAlertsLocator.first()).toBeVisible();
     } else if (alertsSectionPresent) {
-      // Alerts section exists but should contain no error/warning text
-      const alertsText = (await alertsSection.textContent()) ?? '';
-      expect(alertsText).not.toMatch(/error/i);
+      // Alerts section exists – there should be no active error/warning elements
+      const activeAlerts = alertsSection.locator(ACTIVE_ALERT_SELECTOR);
+      await expect(activeAlerts).toHaveCount(0);
     } else {
       // Neither found – annotate for future selector updates
       test.info().annotations.push({
@@ -45,7 +51,7 @@ test.describe('Alert Monitoring During Operations', () => {
     }
   });
 
-  test('should not produce alerts after page interactions', async ({ page }) => {
+  test('should not produce active alerts after page interactions', async ({ page }) => {
     await loadEnvironment(page, env.id);
     await waitForMapLoad(page);
 
@@ -63,7 +69,7 @@ test.describe('Alert Monitoring During Operations', () => {
     // Pause for any delayed alerts
     await page.waitForTimeout(1000);
 
-    const alertsText = await getAlertsText(page);
-    expect(alertsText).not.toMatch(/error/i);
+    const activeAlerts = page.locator(ACTIVE_ALERT_SELECTOR);
+    await expect(activeAlerts).toHaveCount(0);
   });
 });

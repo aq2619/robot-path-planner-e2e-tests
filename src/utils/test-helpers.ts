@@ -17,12 +17,18 @@ export async function waitForMapLoad(page: Page): Promise<void> {
 }
 
 /**
- * Checks the alerts section and asserts no warnings or errors are present.
- * Returns the alert text content for further assertions if needed.
+ * Checks the alerts section and asserts no active warnings or errors are present.
+ * Uses targeted selectors for error/warning state rather than broad text matching
+ * to avoid false positives from messages like "No warnings or errors found".
  */
 export async function assertNoAlerts(page: Page): Promise<void> {
-  const alertsText = await getAlertsText(page);
-  expect(alertsText).not.toMatch(/warning|error/i);
+  const activeAlertLocator = page.locator(
+    '[data-testid="alert-error"], [data-testid="alert-warning"], ' +
+    '.alert--error, .alert--warning, ' +
+    '[role="alert"][class*="error"], [role="alert"][class*="warning"]'
+  );
+  const count = await activeAlertLocator.count();
+  expect(count, 'Expected no active error/warning alert elements').toBe(0);
 }
 
 /**

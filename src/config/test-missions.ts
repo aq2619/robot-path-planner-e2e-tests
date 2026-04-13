@@ -11,20 +11,28 @@ export interface MissionTemplate {
   targetZoneType: string;
 }
 
-export const MISSION_TEMPLATES: MissionTemplate[] = [
-  {
-    name: `mission_restricted_${Date.now()}`,
-    description: 'Test mission targeting a restricted zone boundary',
-    targetZoneType: 'RestrictedZone',
-  },
-  {
-    name: `mission_avoidance_${Date.now()}`,
-    description: 'Test mission with avoidance zone route',
-    targetZoneType: 'AvoidanceZone',
-  },
-  {
-    name: `mission_oneway_${Date.now()}`,
-    description: 'Test mission through a one-way zone',
-    targetZoneType: 'OneWayZone',
-  },
-];
+/**
+ * Returns a fresh set of mission templates with unique timestamped names.
+ * Call this inside each test to avoid name collisions between runs.
+ */
+export function getMissionTemplates(): MissionTemplate[] {
+  const timestamp = Date.now();
+  return [
+    {
+      name: `mission_restricted_${timestamp}_1`,
+      description: 'Test mission targeting a restricted zone boundary',
+      targetZoneType: 'RestrictedZone',
+    },
+    {
+      name: `mission_avoidance_${timestamp}_2`,
+      description: 'Test mission with avoidance zone route',
+      targetZoneType: 'AvoidanceZone',
+    },
+    {
+      name: `mission_oneway_${timestamp}_3`,
+      description: 'Test mission through a one-way zone',
+      targetZoneType: 'OneWayZone',
+    },
+  ];
+}
+
