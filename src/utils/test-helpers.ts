@@ -46,7 +46,10 @@ export async function getAlertsText(page: Page): Promise<string> {
  * Opens the Create Mission dialog via the UI.
  */
 export async function openCreateMissionDialog(page: Page): Promise<void> {
-  await page.click('button:has-text("Create Mission"), [data-testid="create-mission-btn"]');
+  const button = page.locator('button:has-text("Create Mission")').or(
+    page.locator('[data-testid="create-mission-btn"]')
+  );
+  await button.first().click();
   await page.waitForSelector(
     '[role="dialog"], .modal, [data-testid="create-mission-dialog"]',
     { timeout: 10000 }
@@ -67,7 +70,9 @@ export async function fillMissionName(page: Page, name: string): Promise<void> {
  * Submits the current dialog form by clicking the primary action button.
  */
 export async function submitDialog(page: Page): Promise<void> {
-  await page.click(
-    'button:has-text("Save"), button:has-text("Create"), button:has-text("Submit"), [data-testid="dialog-submit-btn"]'
-  );
+  const button = page.locator('button:has-text("Save")')
+    .or(page.locator('button:has-text("Create")'))
+    .or(page.locator('button:has-text("Submit")'))
+    .or(page.locator('[data-testid="dialog-submit-btn"]'));
+  await button.first().click();
 }

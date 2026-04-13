@@ -12,9 +12,14 @@ test.describe('API Health & Endpoint Validation', () => {
     const response = await request.get(`${API_BASE}/health`);
     expect(response.status()).toBe(200);
     const body = await response.json();
-    // Accept either { status: 'healthy' } or { status: 'ok' } conventions
-    expect(body).toHaveProperty('status');
-    expect(String(body.status).toLowerCase()).toMatch(/healthy|ok/);
+    // The health endpoint returns a { checks: [...] } structure where each entry has a `health` field
+    expect(body).toHaveProperty('checks');
+    expect(Array.isArray(body.checks)).toBe(true);
+    expect(body.checks.length).toBeGreaterThan(0);
+    // All checks should report HEALTHY
+    for (const check of body.checks) {
+      expect(check.health).toBe('HEALTHY');
+    }
   });
 
   test('GET /version – should return version information', async ({ request }) => {
