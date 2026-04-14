@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { getMonitorUrl } from '../config/test-environments';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:1000';
 
@@ -43,17 +44,60 @@ export async function getAlertsText(page: Page): Promise<string> {
 }
 
 /**
- * Opens the Create Mission dialog via the UI.
+ * Opens the Create Mission dialog via the toolbar mission icon button.
+ * The button contains an icon with class "node-icon-mission".
  */
 export async function openCreateMissionDialog(page: Page): Promise<void> {
-  const button = page.locator('button:has-text("Create Mission")').or(
-    page.locator('[data-testid="create-mission-btn"]')
-  );
-  await button.first().click();
+  await page.locator('lib-button:has(i.node-icon-mission) button').click();
   await page.waitForSelector(
     '[role="dialog"], .modal, [data-testid="create-mission-dialog"]',
     { timeout: 10000 }
   );
+}
+
+/**
+ * Opens the Mission Library panel via the toolbar map management icon button.
+ * The button contains an icon with class "node-icon-map_management".
+ */
+export async function openMissionLibrary(page: Page): Promise<void> {
+  await page.locator('lib-button:has(i.node-icon-map_management) button').click();
+}
+
+/**
+ * Switches from edit mode to monitor mode for the given environment.
+ */
+export async function switchToMonitorMode(page: Page, environmentId: string): Promise<void> {
+  await page.goto(`${BASE_URL}${getMonitorUrl(environmentId)}`);
+  await page.waitForSelector('canvas', { timeout: 30000 });
+}
+
+/**
+ * Selects a mission from the Mission Library by name and executes it.
+ * Assumes the Mission Library panel is already open (call openMissionLibrary first).
+ *
+ * Flow:
+ * 1. Click the checkbox label for the mission name.
+ * 2. If an Execute button is immediately visible, click it.
+ * 3. Otherwise find the mission dropdown button (contains the UUID) and click it,
+ *    then click Execute from the revealed options.
+ */
+export async function selectAndExecuteMission(page: Page, missionName: string): Promise<void> {
+  // Select the mission by clicking its label in the library
+  await page.locator(`label:has-text("${missionName}")`).click();
+
+  // Check if Execute button is directly visible
+  const executeBtn = page.locator('button:has-text("Execute")');
+  if (await executeBtn.first().isVisible()) {
+    await executeBtn.first().click();
+    return;
+  }
+
+  // Otherwise open the mission dropdown (the button shows the mission UUID)
+  const missionDropdown = page.locator('button.icon-small').first();
+  await missionDropdown.click();
+
+  // Click Execute from the dropdown options
+  await page.locator('button:has-text("Execute")').first().click();
 }
 
 /**

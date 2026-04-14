@@ -27,3 +27,9 @@ export const TEST_ENVIRONMENTS: Record<string, TestEnvironment> = {
  */
 export const getEnvironmentUrl = (environmentId: string): string =>
   `/node-frontend/maps/edit/${environmentId}`;
+
+/**
+ * Returns the URL path for monitoring an environment.
+ */
+export const getMonitorUrl = (environmentId: string): string =>
+  `/node-frontend/maps/monitor/${environmentId}`;

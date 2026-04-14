@@ -5,6 +5,9 @@ import {
   loadEnvironment,
   waitForMapLoad,
   openCreateMissionDialog,
+  openMissionLibrary,
+  switchToMonitorMode,
+  selectAndExecuteMission,
   fillMissionName,
   submitDialog,
   assertNoAlerts,
@@ -47,13 +50,70 @@ test.describe('Mission Creation Against Saved Zones', () => {
       await openCreateMissionDialog(page);
       await fillMissionName(page, template.name);
       await submitDialog(page);
-      // Wait briefly between mission creations
-      await page.waitForTimeout(500);
+      // Wait for dialog to close before opening the next one
+      await page.waitForSelector('[role="dialog"], .modal, [data-testid="create-mission-dialog"]', {
+        state: 'hidden',
+        timeout: 10000,
+      });
     }
 
     // All missions should appear in the list
     for (const template of templates) {
       await expect(page.locator(`text=${template.name}`).first()).toBeVisible({ timeout: 15000 });
+    }
+
+    await assertNoAlerts(page);
+  });
+});
+
+test.describe('Mission Execution Workflow', () => {
+  test('should execute a single mission in monitor mode', async ({ page }) => {
+    // Create a mission in edit mode first
+    await loadEnvironment(page, env.id);
+    await waitForMapLoad(page);
+
+    const [template] = getMissionTemplates();
+    await openCreateMissionDialog(page);
+    await fillMissionName(page, template.name);
+    await submitDialog(page);
+    await expect(page.locator(`text=${template.name}`).first()).toBeVisible({ timeout: 15000 });
+
+    // Switch to monitor mode
+    await switchToMonitorMode(page, env.id);
+
+    // Open mission library and execute the mission
+    await openMissionLibrary(page);
+    await selectAndExecuteMission(page, template.name);
+
+    // Verify execution started (status indicator or no error)
+    await assertNoAlerts(page);
+  });
+
+  test('should queue multiple missions in monitor mode', async ({ page }) => {
+    // Create missions in edit mode
+    await loadEnvironment(page, env.id);
+    await waitForMapLoad(page);
+
+    const templates = getMissionTemplates();
+    for (const template of templates) {
+      await openCreateMissionDialog(page);
+      await fillMissionName(page, template.name);
+      await submitDialog(page);
+      // Wait for dialog to close before opening the next one
+      await page.waitForSelector('[role="dialog"], .modal, [data-testid="create-mission-dialog"]', {
+        state: 'hidden',
+        timeout: 10000,
+      });
+    }
+
+    // Switch to monitor mode and queue each mission
+    await switchToMonitorMode(page, env.id);
+
+    for (const template of templates) {
+      await openMissionLibrary(page);
+      await selectAndExecuteMission(page, template.name);
+      // Wait for the mission to be queued before proceeding to the next one
+      await page.waitForTimeout(500);
     }
 
     await assertNoAlerts(page);
