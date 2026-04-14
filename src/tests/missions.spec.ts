@@ -9,6 +9,8 @@ import {
   switchToMonitorMode,
   selectAndExecuteMission,
   fillMissionName,
+  selectStation,
+  selectAction,
   submitDialog,
   assertNoAlerts,
 } from '../utils/test-helpers';
@@ -35,6 +37,8 @@ test.describe('Mission Creation Against Saved Zones', () => {
 
     await openCreateMissionDialog(page);
     await fillMissionName(page, template.name);
+    if (template.station) await selectStation(page, template.station);
+    if (template.action) await selectAction(page, template.action);
     await submitDialog(page);
 
     // Mission should appear in the missions list
@@ -49,6 +53,8 @@ test.describe('Mission Creation Against Saved Zones', () => {
     for (const template of templates) {
       await openCreateMissionDialog(page);
       await fillMissionName(page, template.name);
+      if (template.station) await selectStation(page, template.station);
+      if (template.action) await selectAction(page, template.action);
       await submitDialog(page);
       // Wait for dialog to close before opening the next one
       await page.waitForSelector('[role="dialog"], .modal, [data-testid="create-mission-dialog"]', {
@@ -75,6 +81,8 @@ test.describe('Mission Execution Workflow', () => {
     const [template] = getMissionTemplates();
     await openCreateMissionDialog(page);
     await fillMissionName(page, template.name);
+    if (template.station) await selectStation(page, template.station);
+    if (template.action) await selectAction(page, template.action);
     await submitDialog(page);
     await expect(page.locator(`text=${template.name}`).first()).toBeVisible({ timeout: 15000 });
 
@@ -84,6 +92,9 @@ test.describe('Mission Execution Workflow', () => {
     // Open mission library and execute the mission
     await openMissionLibrary(page);
     await selectAndExecuteMission(page, template.name);
+
+    // Wait for execution to start before checking for errors
+    await page.waitForTimeout(2500);
 
     // Verify execution started (status indicator or no error)
     await assertNoAlerts(page);
@@ -98,6 +109,8 @@ test.describe('Mission Execution Workflow', () => {
     for (const template of templates) {
       await openCreateMissionDialog(page);
       await fillMissionName(page, template.name);
+      if (template.station) await selectStation(page, template.station);
+      if (template.action) await selectAction(page, template.action);
       await submitDialog(page);
       // Wait for dialog to close before opening the next one
       await page.waitForSelector('[role="dialog"], .modal, [data-testid="create-mission-dialog"]', {
@@ -115,6 +128,9 @@ test.describe('Mission Execution Workflow', () => {
       // Wait for the mission to be queued before proceeding to the next one
       await page.waitForTimeout(500);
     }
+
+    // Wait for execution to start before checking for errors
+    await page.waitForTimeout(2500);
 
     await assertNoAlerts(page);
   });
