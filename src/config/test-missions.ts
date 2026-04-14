@@ -9,6 +9,10 @@ export interface MissionTemplate {
   name: string;
   description: string;
   targetZoneType: string;
+  /** Station name to select in the ng-select "Select Station" dropdown */
+  station?: string;
+  /** Action name to select in the ng-select "Select Action" dropdown */
+  action?: string;
 }
 
 /**
@@ -22,16 +26,22 @@ export function getMissionTemplates(): MissionTemplate[] {
       name: `mission_restricted_${timestamp}_1`,
       description: 'Test mission targeting a restricted zone boundary',
       targetZoneType: 'RestrictedZone',
+      station: process.env.TEST_STATION_1 || 'Station 1',
+      action: process.env.TEST_ACTION_1 || 'Dock',
     },
     {
       name: `mission_avoidance_${timestamp}_2`,
       description: 'Test mission with avoidance zone route',
       targetZoneType: 'AvoidanceZone',
+      station: process.env.TEST_STATION_2 || 'Station 2',
+      action: process.env.TEST_ACTION_2 || 'Dock',
     },
     {
       name: `mission_oneway_${timestamp}_3`,
       description: 'Test mission through a one-way zone',
       targetZoneType: 'OneWayZone',
+      station: process.env.TEST_STATION_3 || 'Station 3',
+      action: process.env.TEST_ACTION_3 || 'Dock',
     },
   ];
 }
