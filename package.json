@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "End-to-end tests for the robot path planner frontend",
   "scripts": {
-    "test": "playwright test",
+    "test": "playwright test --headed",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
     "test:health": "playwright test health.spec.ts",
