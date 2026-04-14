@@ -105,9 +105,29 @@ export async function selectAndExecuteMission(page: Page, missionName: string): 
  */
 export async function fillMissionName(page: Page, name: string): Promise<void> {
   await page.fill(
-    'input[placeholder*="mission" i], input[name*="mission" i], [data-testid="mission-name-input"]',
+    'input#name, input[placeholder="Enter mission name"]',
     name
   );
+}
+
+/**
+ * Selects a station from the ng-select "Select Station" dropdown.
+ * Must be called while the Create Mission dialog is open.
+ */
+export async function selectStation(page: Page, stationName: string): Promise<void> {
+  await page.locator('ng-select#autocomplete').click();
+  await page.waitForSelector('.ng-dropdown-panel', { timeout: 5000 });
+  await page.locator('.ng-option').filter({ hasText: stationName }).first().click();
+}
+
+/**
+ * Selects an action from the ng-select "Select Action" dropdown.
+ * Must be called while the Create Mission dialog is open.
+ */
+export async function selectAction(page: Page, actionName: string): Promise<void> {
+  await page.locator('ng-select#select-input').click();
+  await page.waitForSelector('.ng-dropdown-panel', { timeout: 5000 });
+  await page.locator('.ng-option').filter({ hasText: actionName }).first().click();
 }
 
 /**

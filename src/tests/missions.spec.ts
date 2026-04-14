@@ -9,11 +9,16 @@ import {
   switchToMonitorMode,
   selectAndExecuteMission,
   fillMissionName,
+  selectStation,
+  selectAction,
   submitDialog,
   assertNoAlerts,
 } from '../utils/test-helpers';
 
 const env = TEST_ENVIRONMENTS.PRIMARY;
+
+/** Milliseconds to wait after triggering mission execution before checking for alerts. */
+const EXECUTION_START_DELAY_MS = 2000;
 
 test.describe('Mission Creation Against Saved Zones', () => {
   test.beforeEach(async ({ page }) => {
@@ -35,6 +40,8 @@ test.describe('Mission Creation Against Saved Zones', () => {
 
     await openCreateMissionDialog(page);
     await fillMissionName(page, template.name);
+    await selectStation(page, template.station);
+    await selectAction(page, template.action);
     await submitDialog(page);
 
     // Mission should appear in the missions list
@@ -49,6 +56,8 @@ test.describe('Mission Creation Against Saved Zones', () => {
     for (const template of templates) {
       await openCreateMissionDialog(page);
       await fillMissionName(page, template.name);
+      await selectStation(page, template.station);
+      await selectAction(page, template.action);
       await submitDialog(page);
       // Wait for dialog to close before opening the next one
       await page.waitForSelector('[role="dialog"], .modal, [data-testid="create-mission-dialog"]', {
@@ -75,15 +84,21 @@ test.describe('Mission Execution Workflow', () => {
     const [template] = getMissionTemplates();
     await openCreateMissionDialog(page);
     await fillMissionName(page, template.name);
+    await selectStation(page, template.station);
+    await selectAction(page, template.action);
     await submitDialog(page);
     await expect(page.locator(`text=${template.name}`).first()).toBeVisible({ timeout: 15000 });
 
-    // Switch to monitor mode
+    // Switch to monitor mode and wait for canvas to load
     await switchToMonitorMode(page, env.id);
+    await waitForMapLoad(page);
 
     // Open mission library and execute the mission
     await openMissionLibrary(page);
     await selectAndExecuteMission(page, template.name);
+
+    // Give execution time to start before checking for alerts
+    await page.waitForTimeout(EXECUTION_START_DELAY_MS);
 
     // Verify execution started (status indicator or no error)
     await assertNoAlerts(page);
@@ -98,6 +113,8 @@ test.describe('Mission Execution Workflow', () => {
     for (const template of templates) {
       await openCreateMissionDialog(page);
       await fillMissionName(page, template.name);
+      await selectStation(page, template.station);
+      await selectAction(page, template.action);
       await submitDialog(page);
       // Wait for dialog to close before opening the next one
       await page.waitForSelector('[role="dialog"], .modal, [data-testid="create-mission-dialog"]', {
@@ -106,8 +123,9 @@ test.describe('Mission Execution Workflow', () => {
       });
     }
 
-    // Switch to monitor mode and queue each mission
+    // Switch to monitor mode and wait for canvas to load
     await switchToMonitorMode(page, env.id);
+    await waitForMapLoad(page);
 
     for (const template of templates) {
       await openMissionLibrary(page);
@@ -115,6 +133,9 @@ test.describe('Mission Execution Workflow', () => {
       // Wait for the mission to be queued before proceeding to the next one
       await page.waitForTimeout(500);
     }
+
+    // Give execution time to start before checking for alerts
+    await page.waitForTimeout(EXECUTION_START_DELAY_MS);
 
     await assertNoAlerts(page);
   });
